@@ -20,26 +20,7 @@ const ReturnCountries = ( {countriesToShow} ) => {
     )
   } else if (countriesToShow.length === 1) {
     return (
-      <>
-        <h1>{countriesToShow[0].name.common}</h1>
-        <div>
-          <p>capital {countriesToShow[0].capital}</p>
-          <p>area {countriesToShow[0].area}</p>
-        </div>
-        <div>
-          <h3>languages:</h3>
-          <ul>
-            {Object.entries(countriesToShow[0].languages).map(([key, language]) =>
-              <li key={key}>
-                {language}
-              </li>
-            )}
-          </ul>
-        </div>
-        <div>
-          <img src={countriesToShow[0].flags.png} width="30%" height="30%"/>
-        </div>
-      </>
+      <CountryInform country={countriesToShow[0]} />
     )
   } else {
       return (
@@ -48,19 +29,58 @@ const ReturnCountries = ( {countriesToShow} ) => {
     }
 }
 
-
+const CountryInform = ( {country} ) => {
+  return (
+    <>
+      <h1>{country.name.common}</h1>
+      <div>
+        <p>capital {country.capital}</p>
+        <p>area {country.area}</p>
+      </div>
+      <div>
+        <h3>languages:</h3>
+        <ul>
+          {Object.entries(country.languages).map(([key, language]) =>
+            <li key={key}>
+              {language}
+            </li>
+          )}
+        </ul>
+      </div>
+      <div>
+        <img src={country.flags.png} width="30%" height="30%"/>
+      </div>
+    </>
+  )
+}
 
 const CountriesList = ( {countriesToShow} ) => {
   return (
     <>
       {countriesToShow.map(country =>
         <div key={country.name.common}>
-            {country.name.common}
+            <Country country={country} />
         </div>
+        
       )}
     </>
   )
   
+}
+
+const Country = ( {country} ) => {
+  const [buttonState, setButtonState] = useState(false)
+
+  const handleClick = () => {
+    setButtonState(!buttonState)
+  }
+
+  return (
+    <>
+      {country.name.common} <button onClick={handleClick}>show</button>
+      {buttonState && <CountryInform country={country} />}
+    </>
+  )
 }
 
 const App = () => {
