@@ -24,7 +24,7 @@ const ReturnCountries = ( {countriesToShow} ) => {
     )
   } else {
       return (
-          <CountriesList countriesToShow={countriesToShow} />
+        <CountriesList countriesToShow={countriesToShow} />
       )
     }
 }
@@ -48,8 +48,32 @@ const CountryInform = ( {country} ) => {
         </ul>
       </div>
       <div>
-        <img src={country.flags.png} width="30%" height="30%"/>
+        <img src={country.flags.png}/>
       </div>
+      <Weather capital={country.capital} />
+    </>
+  )
+}
+
+const Weather = ( {capital} ) => {
+  const api_key = process.env.REACT_APP_WEATHER_API_KEY
+  const [weatherInfo, setWeatherInfo] = useState([])
+
+  const hook = () => {
+    axios
+      .get(`https://api.openweathermap.org/data/2.5/weather?q=${capital}&APPID=${api_key}`)
+      .then(response => setWeatherInfo(response.data))
+  }
+  useEffect(hook, [])
+  const st = 'http://openweathermap.org/img/wn/'
+  const imgSrc = st.concat(weatherInfo.weather[0].icon, '@2x.png')
+console.log(imgSrc);
+  return (
+    <>
+      <h3>Weather in {capital}</h3>
+      <p>temperature {weatherInfo.main.temp} Celcius</p>
+      <img src={imgSrc}/>
+      <p>wind {weatherInfo.wind.speed} m/s</p>
     </>
   )
 }
@@ -61,7 +85,6 @@ const CountriesList = ( {countriesToShow} ) => {
         <div key={country.name.common}>
             <Country country={country} />
         </div>
-        
       )}
     </>
   )
