@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import personService from './services/persons'
 import Filter from './components/Filter'
 import Person from './components/Person'
 import NewPersonForm from './components/NewPersonForm'
+import Notification from './components/Notification'
+import './index.css'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -11,7 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setNameFilter] = useState('')
   const [showAll, setShowAll] = useState(true)
-  const [messageText, setMessageText] = useState(null)
+  const [message, setMessage] = useState(null)
 
   const hook = () => {
     personService
@@ -32,7 +33,7 @@ const App = () => {
         .remove(id)
         .then(response => {
           setPersons(personsToShow.filter(p => p !== person))
-          setMessageText({
+          setMessage({
             text: `${person.name} has removed`,
             type: "success",
           })
@@ -61,6 +62,13 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
+
+          setMessage(
+            `Added ${returnedPerson.name}`
+          )
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
         })
       
     } else {
@@ -73,6 +81,13 @@ const App = () => {
           .update(person.id, changedPerson)
           .then(returnedPerson => {
             setPersons(persons.map(person => person.id !== changedPerson.id ? person : returnedPerson))
+            
+            setMessage(
+              `Edited ${returnedPerson.name}'s number`
+            )
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
           })
           .catch(error => {
             alert(
@@ -108,6 +123,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter onChange={handleFilterChange} />
       <h2>add a new</h2>
       <NewPersonForm onSubmit={addNew}
