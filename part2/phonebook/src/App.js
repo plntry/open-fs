@@ -24,10 +24,9 @@ const App = () => {
   useEffect(hook, [])
 
   const removePersonOf = (id) => {
-    const url = `http://localhost:3001/persons/${id}`
     const person = persons.find(p => p.id === id)
-
     const answer = window.confirm(`Delete ${person.name}?`)
+
     if (answer) {
       personService
         .remove(id)
@@ -50,13 +49,12 @@ const App = () => {
   const addNew = (event) => {
     event.preventDefault()
 
-    if (!(persons.some((el) => el.name === newName))) {
-      const nameObject = {
-        name: newName,
-        number: newNumber,
-        id: persons.length + 1
-      }
-
+    const nameObject = {
+      name: newName,
+      number: newNumber
+    }
+    
+    if (!(persons.some((person) => person.name === newName))) {
       personService
         .create(nameObject)
         .then(returnedPerson => {
@@ -65,8 +63,27 @@ const App = () => {
           setNewNumber('')
         })
       
-    } else
-        alert(`${newName} is already added to phonebook`)
+    } else {
+      const answer = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)
+      if (answer) {
+        const person = persons.find(p => p.name === nameObject.name)
+        const changedPerson = { ...person, number: newNumber }
+
+        personService
+          .update(person.id, changedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== changedPerson.id ? person : returnedPerson))
+          })
+          .catch(error => {
+            alert(
+              `the number '${person.number}' was already deleted from server`
+              )
+              setPersons(persons.filter(p => p.id !== changedPerson.id))
+          })
+      }
+
+    }
+        
   } 
 
   const handleNameChange = (event) => {
