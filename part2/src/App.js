@@ -17,7 +17,6 @@ const App = () => {
   }, [])
 
   const toggleImportanceOf = (id) => {
-    const url = `http://localhost:3001/notes/${id}`
     const note = notes.find(n => n.id === id)
     const changedNote = { ...note, important: !note.important }
 
@@ -28,7 +27,7 @@ const App = () => {
       })
       .catch(error => {
         alert(
-          `the note '${note.id}' was already deleted from server`
+          `the note '${note.content}' was already deleted from server`
           )
           setNotes(notes.filter(n => n.id !== id))
       })

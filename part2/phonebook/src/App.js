@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import personService from './services/persons'
 import Filter from './components/Filter'
-import Persons from './components/Persons'
+import Person from './components/Person'
 import NewPersonForm from './components/NewPersonForm'
 
 const App = () => {
@@ -11,6 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [nameFilter, setNameFilter] = useState('')
   const [showAll, setShowAll] = useState(true)
+  const [messageText, setMessageText] = useState(null)
 
   const hook = () => {
     personService
@@ -21,6 +22,30 @@ const App = () => {
   }
 
   useEffect(hook, [])
+
+  const removePersonOf = (id) => {
+    const url = `http://localhost:3001/persons/${id}`
+    const person = persons.find(p => p.id === id)
+
+    const answer = window.confirm(`Delete ${person.name}?`)
+    if (answer) {
+      personService
+        .remove(id)
+        .then(response => {
+          setPersons(personsToShow.filter(p => p !== person))
+          setMessageText({
+            text: `${person.name} has removed`,
+            type: "success",
+          })
+        })
+        .catch((error) => {
+          alert(
+            `the person '${person.name}' was already deleted from server`
+            )
+            setPersons(persons.filter(p => p.id !== id))
+        })
+    }
+  }
 
   const addNew = (event) => {
     event.preventDefault()
@@ -73,7 +98,13 @@ const App = () => {
         valueNumber={newNumber} onChangeNumber={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      {personsToShow.map(person => 
+        <Person
+          key={person.id}
+          person={person}
+          removePerson={() => removePersonOf(person.id)}
+        />
+      )}
     </div>
   )
 }
