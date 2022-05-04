@@ -39,10 +39,14 @@ const App = () => {
           })
         })
         .catch((error) => {
-          alert(
-            `the person '${person.name}' was already deleted from server`
-            )
-            setPersons(persons.filter(p => p.id !== id))
+          setMessage(
+            `Information of ${person.name} has already been removed from server`
+          )
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
+
+          setPersons(persons.filter(p => p.id !== id))
         })
     }
   }
@@ -59,16 +63,16 @@ const App = () => {
       personService
         .create(nameObject)
         .then(returnedPerson => {
-          setPersons(persons.concat(returnedPerson))
-          setNewName('')
-          setNewNumber('')
-
           setMessage(
             `Added ${returnedPerson.name}`
           )
           setTimeout(() => {
             setMessage(null)
           }, 5000)
+
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
         })
       
     } else {
@@ -80,14 +84,14 @@ const App = () => {
         personService
           .update(person.id, changedPerson)
           .then(returnedPerson => {
-            setPersons(persons.map(person => person.id !== changedPerson.id ? person : returnedPerson))
-            
             setMessage(
               `Edited ${returnedPerson.name}'s number`
             )
             setTimeout(() => {
               setMessage(null)
             }, 5000)
+
+            setPersons(persons.map(person => person.id !== changedPerson.id ? person : returnedPerson))
           })
           .catch(error => {
             alert(
