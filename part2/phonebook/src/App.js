@@ -24,24 +24,19 @@ const App = () => {
 
   useEffect(hook, [])
 
-  const removePersonOf = (id) => {
+  const removePerson = (id) => {
     const person = persons.find(p => p.id === id)
     const answer = window.confirm(`Delete ${person.name}?`)
 
     if (answer) {
       personService
         .remove(id)
-        .then(response => {
-          setPersons(personsToShow.filter(p => p !== person))
-          setMessage({
-            text: `${person.name} has removed`,
-            type: "success",
-          })
+        .then(() => {
+          setPersons(persons.filter(p => p !== id))
+          setMessage(`${person.name} has removed`)
         })
         .catch((error) => {
-          setMessage(
-            `Information of ${person.name} has already been removed from server`
-          )
+          setMessage(`Information of ${person.name} has already been removed from server`)
           setTimeout(() => {
             setMessage(null)
           }, 5000)
@@ -139,7 +134,7 @@ const App = () => {
         <Person
           key={person.id}
           person={person}
-          removePerson={() => removePersonOf(person.id)}
+          removePerson={removePerson}
         />
       )}
     </div>

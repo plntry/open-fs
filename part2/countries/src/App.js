@@ -1,144 +1,117 @@
-import React, {useState, useEffect} from "react"
-import axios from "axios"
+import axios from 'axios'
+import { useState, useEffect } from 'react'
 
-const Filter = ( {onChange} ) => {
-  return (
-    <>
-        find countries <input onChange={onChange} />
-    </>
-  )
+const Weather = ({ weather, city }) => {
+  if ( weather === null ) return null
+
+  const icon = `http://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`
+
+  return <div>
+    <h3>Weather in {city}</h3>
+
+    <div>
+      temperature {weather.main.temp} Celcius
+    </div>
+
+    <div>
+      <img src={icon} alt={`icon for ${weather.weather[0].description}`} />
+    </div>
+    
+    <div>
+      wind {weather.wind.speed} m/s
+    </div>
+
+  </div>
+
 }
 
-const ReturnCountries = ( {countriesToShow} ) => {
-  if (countriesToShow.length === 0) {
-    return (
-      <><p>Search for a country</p></>
-    )
-  } else if (countriesToShow.length > 10) {
-    return (
-      <><p>Too many matches, specify another filter</p></>
-    )
-  } else if (countriesToShow.length === 1) {
-    return (
-      <CountryInform country={countriesToShow[0]} />
-    )
-  } else {
-      return (
-        <CountriesList countriesToShow={countriesToShow} />
-      )
-    }
-}
+const Country = ({ country }) => {
+  const [weather, setWeather] = useState(null)
+  const languages = Object.values(country.languages)
+  const capital = country.capital[0]
 
-const CountryInform = ( {country} ) => {
-  return (
-    <>
-      <h1>{country.name.common}</h1>
-      <div>
-        <p>capital {country.capital}</p>
-        <p>area {country.area}</p>
-      </div>
-      <div>
-        <h3>languages:</h3>
-        <ul>
-          {Object.entries(country.languages).map(([key, language]) =>
-            <li key={key}>
-              {language}
-            </li>
-          )}
-        </ul>
-      </div>
-      <div>
-        <img src={country.flags.png}/>
-      </div>
-      <Weather capital={country.capital} />
-    </>
-  )
-}
+  useEffect(() => {
+    const key = process.env.REACT_APP_WEATHER_API_KEY
+    const url = `http://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${key}&units=metric`
+    axios.get(url).then(({data}) => {
+      setWeather(data)
+    })
+  }, [])
 
-const Weather = ( {capital} ) => {
-  const api_key = process.env.REACT_APP_WEATHER_API_KEY
-  const [weatherInfo, setWeatherInfo] = useState([])
+  return <div>
+    <h2>{country.name.common}</h2>
+    <div>capital {capital} </div>
+    <div>area {country.area} </div>
 
-  const hook = () => {
-    axios
-      .get(`https://api.openweathermap.org/data/2.5/weather?q=${capital}&APPID=${api_key}`)
-      .then(response => setWeatherInfo(response.data))
-  }
-  useEffect(hook, [])
-  const st = 'http://openweathermap.org/img/wn/'
-  const imgSrc = st.concat(weatherInfo.weather[0].icon, '@2x.png')
-console.log(imgSrc);
-  return (
-    <>
-      <h3>Weather in {capital}</h3>
-      <p>temperature {weatherInfo.main.temp} Celcius</p>
-      <img src={imgSrc}/>
-      <p>wind {weatherInfo.wind.speed} m/s</p>
-    </>
-  )
-}
-
-const CountriesList = ( {countriesToShow} ) => {
-  return (
-    <>
-      {countriesToShow.map(country =>
-        <div key={country.name.common}>
-            <Country country={country} />
-        </div>
+    <h4>languages:</h4>
+    <ul>
+      {languages.map(language => 
+        <li key={language}>
+          {language}
+        </li>
       )}
-    </>
-  )
-  
+    </ul>
+
+    <img
+      src={country.flags.png}
+      alt={`Flag of ${country.name.common}`}
+      width={150}
+    />
+
+    <Weather weather={weather} city={capital} />
+  </div>
 }
 
-const Country = ( {country} ) => {
-  const [buttonState, setButtonState] = useState(false)
-
-  const handleClick = () => {
-    setButtonState(!buttonState)
+const Contrylist = ({ countries, setFilter }) => {
+  if (countries.length>10) {
+    return <div>Too many countries, specify some other fliter</div>
   }
 
-  return (
-    <>
-      {country.name.common} <button onClick={handleClick}>show</button>
-      {buttonState && <CountryInform country={country} />}
-    </>
-  )
+  if (countries.length===0) {
+    return <div>No matches, specify some other fliter</div>
+  }
+
+  if (countries.length>1) {
+    return (
+      <div>
+        {countries.map(({name}) =>
+          <div key={name.common}>
+            {name.common}
+            <button onClick={() => setFilter(name.common)}>show</button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  return <Country country={countries[0]} />
 }
 
 const App = () => {
-  const [countries, setCountries] = useState([])
-  const [searchCountries, setSearchCountries] = useState('')
-  const [showCountries, setShowCountries] = useState(true)
+  const [countries, setCountries ] = useState([])
+  const [filter, setFilter] = useState('')
 
-  const hook = () => {
-    axios
-      .get('https://restcountries.com/v3.1/all')
-      .then(response => setCountries(response.data))
-  }
-  useEffect(hook, [])
+  useEffect(() => {
+    axios.get('https://restcountries.com/v3.1/all').then(({ data }) => {
+      setCountries(data)
+    })
+  }, [])
 
-  const handleSearchChange = (event) => {
-    console.log(event.target.value)
-    setSearchCountries(event.target.value)
-    setShowCountries(false)
-  }
+  const filtered = countries.filter(c => c.name.common.toLowerCase().includes(filter.toLowerCase()))
 
-  const countriesToShow = showCountries
-    ? []
-    : countries.filter(country => {
-      return country.name.common.toLowerCase().includes(searchCountries.toLowerCase())
-  })
-
-  return (
-    <>
-      <Filter onChange={handleSearchChange} />
-      <ReturnCountries countriesToShow={countriesToShow} />
-
-
-      
-    </>
-  )
+  return <>
+    <div>
+      find countries
+      <input
+        value={filter}
+        onChange={({ target }) => setFilter(target.value)}
+      />
+    </div>
+    <Contrylist
+      countries={filtered}
+      setFilter={setFilter}
+    />
+  </>
 }
 
 export default App
