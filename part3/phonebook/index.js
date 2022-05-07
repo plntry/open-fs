@@ -44,7 +44,7 @@ app.get('/api/persons/:id', (request, response) => {
 app.get('/info', (request, response) => {
   response.send(`
     <p>Phonebook has info for ${persons.length} people</p>
-    <p>${Date()}</p>
+    <p>${new Date()}</p>
   `)
 })
 
@@ -57,7 +57,18 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
   const newId = Math.floor(Math.random() * 10000)
+  const body = request.body
   
+  if (!body.name || !body.number) {
+    return response.status(400).json({
+      error: 'missing name or number'
+    })
+  } else if (persons.some(p => body.name === p.name)) {
+    return response.status(400).json({
+      error: 'name must be unique'
+    })
+  }
+
   const person = request.body
   person.id = newId
 
