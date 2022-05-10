@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import personService from './services/persons'
 import Filter from './components/Filter'
 import Person from './components/Person'
 import NewPersonForm from './components/NewPersonForm'
 import Notification from './components/Notification'
+import personService from './services/persons'
 import './index.css'
 
 const App = () => {
