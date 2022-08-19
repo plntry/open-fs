@@ -31,6 +31,15 @@ const mostBlogs = (blogs) => {
 
 }
 
+const mostLikes = (blogs) => {
+    if (blogs.length === 0) return {}
+
+    const groupedBlogs = _.groupBy(blogs, mostiteratee)
+    const blogsByLikes = _.mapValues(groupedBlogs, totalLikes)
+    const mostLikedAuthor = Object.entries(blogsByLikes).reduce((a, b) => a[1] > b[1] ? a : b)
+    return { 'author': mostLikedAuthor[0], 'likes': mostLikedAuthor[1] }
+}
+
 module.exports = {
-    dummy, totalLikes, favoriteBlog, mostBlogs
+    dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes
 }
