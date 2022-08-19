@@ -51,21 +51,23 @@ const blogs = [
     }
 ]
 
-describe('favorite blog', () => {
+describe('most blogs', () => {
     test('when blog list is empty, should return empty object', () => {
         const blogs = []
-        expect(listHelper.favoriteBlog(blogs)).toEqual({})
+        expect(listHelper.mostBlogs(blogs)).toEqual({})
     })
 
-    test('when blog list has only one blog, equals the likes of that', () => {
-        expect(listHelper.favoriteBlog(blogs.slice(0, 1))).toEqual({
-            _id: '5a422a851b54a676234d17f7',
-            title: 'React patterns',
+    test('when blog list has only one blog, should return author of that', () => {
+        expect(listHelper.mostBlogs(blogs.slice(0, 1))).toEqual({
             author: 'Michael Chan',
-            url: 'https://reactpatterns.com/',
-            likes: 7,
-            __v: 0
+            blogs: 1
+        })
+    })
+
+    test('when blog list has more than one blog, should return author with the max amount of blogs', () => {
+        expect(listHelper.mostBlogs(blogs)).toEqual({
+            author: 'Robert C. Martin',
+            blogs: 3
         })
     })
 })
-

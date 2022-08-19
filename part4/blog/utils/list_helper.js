@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const dummy = (blogs) => {
     return Number(blogs + 1)
 }
@@ -18,6 +19,18 @@ const favoriteBlog = (blogs) => {
     })
 }
 
+const mostiteratee = (blog) => blog.author
+
+const mostBlogs = (blogs) => {
+    if (blogs.length === 0) return {}
+
+    const groupedBlogs = _.groupBy(blogs, mostiteratee)
+    const blogsByAuthors = _.mapValues(groupedBlogs, (e) => e.length)
+    const mostBlog = Object.entries(blogsByAuthors).reduce((a, b) => a[1] > b[1] ? a : b)
+    return { 'author': mostBlog[0], 'blogs': mostBlog[1] }
+
+}
+
 module.exports = {
-    dummy, totalLikes, favoriteBlog
+    dummy, totalLikes, favoriteBlog, mostBlogs
 }
