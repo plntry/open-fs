@@ -1,0 +1,5 @@
+POST http://localhost:3003/api/blogs 
+
+{
+"title": "New root post", "author": "Root", "url": "root.org", "userId": "5d65484c66a4e32cf0cb66a8"
+}

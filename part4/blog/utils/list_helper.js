@@ -1,4 +1,6 @@
 /* eslint-disable no-undef */
+const _ = require('lodash')
+
 const dummy = (blogs) => {
     return Number(blogs + 1)
 }
